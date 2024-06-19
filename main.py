@@ -5,6 +5,12 @@ import google.generativeai as genai
 import re
 import telebot
 import requests
+import logging
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__) 
+
 from telebot.async_telebot import AsyncTeleBot
 from telebot.types import  Message, ReplyKeyboardMarkup, KeyboardButton
 
@@ -277,10 +283,16 @@ async def gemini(bot, message, m):
         await send_message(player, m)
         try:
             await bot.edit_message_text(escape(player.last.text), chat_id=sent_message.chat.id, message_id=sent_message.message_id, parse_mode="MarkdownV2")
-            await send_message_to_api(m, player.last.text)
-        except:
-            await bot.edit_message_text(player.last.text, chat_id=sent_message.chat.id, message_id=sent_message.message_id)
-            await send_message_to_api(m, player.last.text)
+        except Exception as edit_error:
+            logger.warning(f"Error editing message: {edit_error}")  # Log message editing errors 
+            logger.debug(traceback.format_exc())  # More detailed debug log
+        finally:
+            # Attempt to send data to API regardless of message editing success
+            try:
+                await send_message_to_api(m, player.last.text)
+            except Exception as api_error: 
+                logger.error(f"Error sending data to API: {api_error}")
+                logger.debug(traceback.format_exc())
     except Exception as e:
         logger.error(f"Error in Gemini conversation: {e}")
         logger.debug(traceback.format_exc())
@@ -300,12 +312,18 @@ async def gemini_pro(bot, message, m):
         await send_message(player, m)
         try:
             await bot.edit_message_text(escape(player.last.text), chat_id=sent_message.chat.id, message_id=sent_message.message_id, parse_mode="MarkdownV2")
-            await send_message_to_api(m, player.last.text)
-        except:
-            await bot.edit_message_text(player.last.text, chat_id=sent_message.chat.id, message_id=sent_message.message_id)
-            await send_message_to_api(m, player.last.text)
+        except Exception as edit_error:
+            logger.warning(f"Error editing message: {edit_error}")  # Log message editing errors 
+            logger.debug(traceback.format_exc())  # More detailed debug log
+        finally:
+            # Attempt to send data to API regardless of message editing success
+            try:
+                await send_message_to_api(m, player.last.text)
+            except Exception as api_error: 
+                logger.error(f"Error sending data to API: {api_error}")
+                logger.debug(traceback.format_exc())
     except Exception as e:
-        logger.error(f"Error in Gemini Pro conversation: {e}")
+        logger.error(f"Error in Gemini conversation: {e}")
         logger.debug(traceback.format_exc())
         await bot.reply_to(message, error_info)
 
