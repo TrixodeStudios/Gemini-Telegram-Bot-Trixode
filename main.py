@@ -12,7 +12,7 @@ gemini_player_dict = {}
 gemini_pro_player_dict = {}
 default_model_dict = {}
 
-API_ENDPOINT = "https://api-production-a8e7.up.railway.app/getdata"
+API_ENDPOINT = "https://api-production-a8e7.up.railway.app/postdata"
 
 error_info="⚠️⚠️⚠️\nSomething went wrong !\nplease try to change your prompt or contact the admin !"
 before_generate_info="🤖Generating🤖"
