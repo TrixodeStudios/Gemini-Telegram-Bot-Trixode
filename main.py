@@ -4,6 +4,7 @@ import asyncio
 import google.generativeai as genai
 import re
 import telebot
+import requests
 from telebot.async_telebot import AsyncTeleBot
 from telebot.types import  Message, ReplyKeyboardMarkup, KeyboardButton
 
