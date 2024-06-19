@@ -279,12 +279,12 @@ async def main():
     async def handle_language_selection(message: Message):
         language = message.text
 
-        welcome_messages = {
-            "English": "Welcome to the Infinitys-App test pilot! 🙌 \nThank you for being part of Infinitys' pilot plan.",
-            "Español": "¡Bienvenido al piloto de pruebas de la aplicación Infinitys! 🙌 \nGracias por ser parte del plan piloto de Infinitys.",
-            "Русский": "Добро пожаловать в тестовую программу приложения Infinitys! 🙌 \nСпасибо за участие в пилотном проекте Infinitys.",
-            "Français": "Bienvenue dans le programme pilote de l'application Infinitys ! 🙌 \nMerci de faire partie du plan pilote d'Infinitys."
-        }
+       welcome_messages = {
+        "English": "Welcome to the Infinitys-App test pilot! 🙌 \nThank you for being part of Infinitys' pilot plan.\nTry asking something interesting, like: What is the colour of the Universe?",
+        "Español": "¡Bienvenido al piloto de pruebas de la aplicación Infinitys! 🙌 \nGracias por ser parte del plan piloto de Infinitys.\nComienza por preguntar algo divertido, como: Que sabor de helado es el mas popular en la luna?",
+        "Русский": "Добро пожаловать в тестовую программу приложения Infinitys! 🙌 \nСпасибо за участие в пилотном проекте Infinitys.\nПопробуйте спросить что-нибудь интересное, например: Какого цвета Вселенная?",
+        "Français": "Bienvenue dans le programme pilote de l'application Infinitys ! 🙌 \nMerci de faire partie du plan pilote d'Infinitys.\nEssayez de demander quelque chose d'intéressant, par exemple : Quelle est la couleur de l'Univers ?"
+       }
 
         selected_message = welcome_messages.get(language, "Invalid language selection") # Default if language not found
         await bot.send_message(message.chat.id, escape(selected_message), parse_mode="MarkdownV2")
