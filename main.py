@@ -184,27 +184,86 @@ async def async_generate_content(model, contents):
     response = await loop.run_in_executor(None, generate)
     return response
     
+# async def send_message_to_api(user_message: str, gemini_response: str):
+#     """Sends user and Gemini messages to your API."""
+#     try:
+#         # Construct data to send (assuming JSON format)
+#         data = {
+#             "messages": { 
+#                 "user": user_message,
+#                 "gemini": gemini_response
+#             }
+#         }
+
+#         # Make a POST request to your API with JSON data
+#         response = requests.post(API_ENDPOINT, json=data)
+
+#         # Check for HTTP errors 
+#         response.raise_for_status()
+
+#     except requests.exceptions.RequestException as e:
+#         print(f"Error sending data to API: {e}")
+        
+# async def gemini(bot,message,m):
+#     player = None
+#     if str(message.from_user.id) not in gemini_player_dict:
+#         player = await make_new_gemini_convo()
+#         gemini_player_dict[str(message.from_user.id)] = player
+#     else:
+#         player = gemini_player_dict[str(message.from_user.id)]
+#     if len(player.history) > n:
+#         player.history = player.history[2:]
+#     try:
+#         sent_message = await bot.reply_to(message, before_generate_info)
+#         await send_message(player, m)
+#         try:
+#             await bot.edit_message_text(escape(player.last.text), chat_id=sent_message.chat.id, message_id=sent_message.message_id, parse_mode="MarkdownV2")
+#         except:
+#             await bot.edit_message_text(escape(player.last.text), chat_id=sent_message.chat.id, message_id=sent_message.message_id)
+#             await send_message_to_api(m, player.last.text) 
+
+#     except Exception:
+#         traceback.print_exc()
+#         await bot.edit_message_text(error_info, chat_id=sent_message.chat.id, message_id=sent_message.message_id)
+
+# async def gemini_pro(bot,message,m):
+#     player = None
+#     if str(message.from_user.id) not in gemini_pro_player_dict:
+#         player = await make_new_gemini_pro_convo()
+#         gemini_pro_player_dict[str(message.from_user.id)] = player
+#     else:
+#         player = gemini_pro_player_dict[str(message.from_user.id)]
+#     if len(player.history) > n:
+#         player.history = player.history[2:]
+#     try:
+#         sent_message = await bot.reply_to(message, before_generate_info)
+#         await send_message(player, m)
+#         try:
+#             await bot.edit_message_text(escape(player.last.text), chat_id=sent_message.chat.id, message_id=sent_message.message_id, parse_mode="MarkdownV2")
+#         except:
+#             await bot.edit_message_text(escape(player.last.text), chat_id=sent_message.chat.id, message_id=sent_message.message_id)
+#             await send_message_to_api(m, player.last.text) 
+
+#     except Exception:
+#         traceback.print_exc()
+#         await bot.edit_message_text(error_info, chat_id=sent_message.chat.id, message_id=sent_message.message_id)
+
 async def send_message_to_api(user_message: str, gemini_response: str):
-    """Sends user and Gemini messages to your API."""
     try:
-        # Construct data to send (assuming JSON format)
         data = {
             "messages": { 
                 "user": user_message,
                 "gemini": gemini_response
             }
         }
-
-        # Make a POST request to your API with JSON data
+        logger.debug(f"Sending data to API: {data}")
         response = requests.post(API_ENDPOINT, json=data)
-
-        # Check for HTTP errors 
         response.raise_for_status()
-
+        logger.info("Data sent to API successfully.")
     except requests.exceptions.RequestException as e:
-        print(f"Error sending data to API: {e}")
-        
-async def gemini(bot,message,m):
+        logger.error(f"Error sending data to API: {e}")
+
+async def gemini(bot, message, m):
     player = None
     if str(message.from_user.id) not in gemini_player_dict:
         player = await make_new_gemini_convo()
@@ -218,15 +277,16 @@ async def gemini(bot,message,m):
         await send_message(player, m)
         try:
             await bot.edit_message_text(escape(player.last.text), chat_id=sent_message.chat.id, message_id=sent_message.message_id, parse_mode="MarkdownV2")
+            await send_message_to_api(m, player.last.text)
         except:
-            await bot.edit_message_text(escape(player.last.text), chat_id=sent_message.chat.id, message_id=sent_message.message_id)
-            await send_message_to_api(m, player.last.text) 
+            await bot.edit_message_text(player.last.text, chat_id=sent_message.chat.id, message_id=sent_message.message_id)
+            await send_message_to_api(m, player.last.text)
+    except Exception as e:
+        logger.error(f"Error in Gemini conversation: {e}")
+        logger.debug(traceback.format_exc())
+        await bot.reply_to(message, error_info)
 
-    except Exception:
-        traceback.print_exc()
-        await bot.edit_message_text(error_info, chat_id=sent_message.chat.id, message_id=sent_message.message_id)
-
-async def gemini_pro(bot,message,m):
+async def gemini_pro(bot, message, m):
     player = None
     if str(message.from_user.id) not in gemini_pro_player_dict:
         player = await make_new_gemini_pro_convo()
@@ -240,13 +300,14 @@ async def gemini_pro(bot,message,m):
         await send_message(player, m)
         try:
             await bot.edit_message_text(escape(player.last.text), chat_id=sent_message.chat.id, message_id=sent_message.message_id, parse_mode="MarkdownV2")
+            await send_message_to_api(m, player.last.text)
         except:
-            await bot.edit_message_text(escape(player.last.text), chat_id=sent_message.chat.id, message_id=sent_message.message_id)
-            await send_message_to_api(m, player.last.text) 
-
-    except Exception:
-        traceback.print_exc()
-        await bot.edit_message_text(error_info, chat_id=sent_message.chat.id, message_id=sent_message.message_id)
+            await bot.edit_message_text(player.last.text, chat_id=sent_message.chat.id, message_id=sent_message.message_id)
+            await send_message_to_api(m, player.last.text)
+    except Exception as e:
+        logger.error(f"Error in Gemini Pro conversation: {e}")
+        logger.debug(traceback.format_exc())
+        await bot.reply_to(message, error_info)
 
 async def main():
     # Init args
