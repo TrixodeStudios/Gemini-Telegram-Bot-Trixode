@@ -256,18 +256,6 @@ async def main():
         markup.add(KeyboardButton("English"), KeyboardButton("Español"), 
                    KeyboardButton("Русский"), KeyboardButton("Français"))
 
-        sticker_url = 'https://raw.githubusercontent.com/TrixodeStudios/Gemini-Telegram-Bot-Trixode/main/trixode.tgs'
-        response = requests.get(sticker_url)
-        response.raise_for_status()  # Check for download errors
-
-        with open('trixode.tgs', 'wb') as f:
-            f.write(response.content)
-
-        # Send the downloaded sticker
-        with open('trixode.tgs', 'rb') as sticker_file:
-            sticker = InputFile(sticker_file, filename='trixode.tgs')
-            await bot.send_sticker(message.chat.id, sticker)
-
         await bot.send_message(message.chat.id, "👋 ¡Hola! Bonjour! привет! Hello! \n" 
                                                "Please select your preferred language:", 
                                                reply_markup=markup)
