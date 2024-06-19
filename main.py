@@ -5,7 +5,7 @@ import google.generativeai as genai
 import re
 import telebot
 from telebot.async_telebot import AsyncTeleBot
-from telebot.types import  Message
+from telebot.types import  Message, ReplyKeyboardMarkup, KeyboardButton
 
 gemini_player_dict = {}
 gemini_pro_player_dict = {}
@@ -239,21 +239,74 @@ async def main():
     await bot.set_my_commands(
         commands=[
             telebot.types.BotCommand("start", "Start"),
-            telebot.types.BotCommand("gemini", "using gemini-1.5-flash"),
-            telebot.types.BotCommand("gemini_pro", "using gemini-1.5-pro"),
+            telebot.types.BotCommand("gemini", "Use gemini-1.5-flash"),
+            telebot.types.BotCommand("gemini_pro", "Use gemini-1.5-pro"),
             telebot.types.BotCommand("clear", "Clear all history"),
-            telebot.types.BotCommand("switch","switch default model")
+            telebot.types.BotCommand("switch","Switch default model"),
+            telebot.types.BotCommand("social", "Our Social Media"),
+            telebot.types.BotCommand("terms", "Terms and Conditions of Infinitys"), 
         ],
     )
     print("Bot init done.")
+    
+    async def send_welcome_message(message: Message):
+        # Create a keyboard with language buttons
+        markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+        markup.add(KeyboardButton("English"), KeyboardButton("Español"), 
+                   KeyboardButton("Русский"), KeyboardButton("Français"))
+
+        await bot.send_message(message.chat.id, "👋 ¡Hola! Bonjour! привет! Hello! \n" 
+                                               "Please select your preferred language:", 
+                                               reply_markup=markup)
+
+    @bot.message_handler(commands=['start'])
+    async def handle_start(message: Message):
+        await send_welcome_message(message)
+
+    @bot.message_handler(func=lambda message: message.text in ["English", "Español", "Русский", "Français"])
+    async def handle_language_selection(message: Message):
+        language = message.text
+
+        welcome_messages = {
+            "English": "Welcome to the Infinitys-App test pilot! 🙌 \nThank you for being part of Infinitys' pilot plan.",
+            "Español": "¡Bienvenido al piloto de pruebas de la aplicación Infinitys! 🙌 \nGracias por ser parte del plan piloto de Infinitys.",
+            "Русский": "Добро пожаловать в тестовую программу приложения Infinitys! 🙌 \nСпасибо за участие в пилотном проекте Infinitys.",
+            "Français": "Bienvenue dans le programme pilote de l'application Infinitys ! 🙌 \nMerci de faire partie du plan pilote d'Infinitys."
+        }
+
+        selected_message = welcome_messages.get(language, "Invalid language selection") # Default if language not found
+        await bot.send_message(message.chat.id, escape(selected_message), parse_mode="MarkdownV2")
+
+    # --- Social Media Command ---
+
+    @bot.message_handler(commands=["social"])
+    async def social_media_handler(message: Message):
+        # Replace with your actual social media links
+        social_media_message = (
+            "Find us on social media:\n"
+            "- [Instagram](https://www.instagram.com/trixode_studios/)\n"
+            "- [Website](https://www.trixode-studios.com/)\n"
+            "- [Facebook](https://www.facebook.com/profile.php?id=61560187936462)"
+        )
+        await bot.send_message(message.chat.id, social_media_message, parse_mode="Markdown") 
+
+    # --- Terms and Conditions Command ---
+
+    @bot.message_handler(commands=["terms"])
+    async def terms_conditions_handler(message: Message):
+        # Either provide a link to your terms and conditions or display them directly
+        terms_message = (
+            "Please review our [Terms and Conditions](https://trixodestudios.my.canva.site/pilot-trixode)."
+        )
+        await bot.send_message(message.chat.id, terms_message, parse_mode="Markdown") 
 
     # Init commands
-    @bot.message_handler(commands=["start"])
-    async def gemini_handler(message: Message):
-        try:
-            await bot.reply_to( message , escape("Welcome, you can ask me questions now. \nFor example: `Who is john lennon?`"), parse_mode="MarkdownV2")
-        except IndexError:
-            await bot.reply_to(message, error_info)
+    # @bot.message_handler(commands=["start"])
+    # async def gemini_handler(message: Message):
+    #     try:
+    #         await bot.reply_to( message , escape("Welcome to the Infinitys-App test pilot!. 🙌 \nGracias por ser parte del plan piloto de Infinitys.\nThank you for being part of Infinitys' pilot plan.\nСпасибо за участие в пилотном проекте Infinitys.\nMerci de faire partie du plan pilote d'Infinitys.\nTry searching something fun: `What is my cat dreaming? 😸`"), parse_mode="MarkdownV2")
+    #     except IndexError:
+    #         await bot.reply_to(message, error_info)
 
     @bot.message_handler(commands=["gemini"])
     async def gemini_handler(message: Message):
