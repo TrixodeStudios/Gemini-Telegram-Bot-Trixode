@@ -255,12 +255,18 @@ async def async_generate_content(model, contents):
 #         await bot.edit_message_text(error_info, chat_id=sent_message.chat.id, message_id=sent_message.message_id)
 
 async def send_message_to_api(user_message: str, gemini_response: str):
+  
     try:
+
+      chat_id = message.chat.id 
+      
         data = {
             "messages": { 
                 "user": user_message,
                 "gemini": gemini_response
-            }
+            },
+            "chat_id": chat_id, 
+            "nickname": message.from_user.username  # Get the username
         }
         logger.debug(f"Sending data to API: {data}")
         response = requests.post(API_ENDPOINT, json=data)
@@ -289,7 +295,7 @@ async def gemini(bot, message, m):
         finally:
             # Attempt to send data to API regardless of message editing success
             try:
-                await send_message_to_api(m, player.last.text)
+                await send_message_to_api(m, player.last.text, message)
             except Exception as api_error: 
                 logger.error(f"Error sending data to API: {api_error}")
                 logger.debug(traceback.format_exc())
@@ -318,7 +324,7 @@ async def gemini_pro(bot, message, m):
         finally:
             # Attempt to send data to API regardless of message editing success
             try:
-                await send_message_to_api(m, player.last.text)
+                 await send_message_to_api(m, player.last.text, message)
             except Exception as api_error: 
                 logger.error(f"Error sending data to API: {api_error}")
                 logger.debug(traceback.format_exc())
