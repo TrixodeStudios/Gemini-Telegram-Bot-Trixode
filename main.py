@@ -259,19 +259,18 @@ async def send_message_to_api(user_message: str, gemini_response: str):
     try:
 
       chat_id = message.chat.id 
-      
-        data = {
-            "messages": { 
-                "user": user_message,
-                "gemini": gemini_response
-            },
-            "chat_id": chat_id, 
-            "nickname": message.from_user.username  # Get the username
-        }
-        logger.debug(f"Sending data to API: {data}")
-        response = requests.post(API_ENDPOINT, json=data)
-        response.raise_for_status()
-        logger.info("Data sent to API successfully.")
+      data = {
+          "messages": { 
+              "user": user_message,
+              "gemini": gemini_response
+              },
+              "chat_id": chat_id, 
+              "nickname": message.from_user.username  # Get the username
+              }
+      logger.debug(f"Sending data to API: {data}")
+      response = requests.post(API_ENDPOINT, json=data)
+      response.raise_for_status()
+      logger.info("Data sent to API successfully.")
     except requests.exceptions.RequestException as e:
         logger.error(f"Error sending data to API: {e}")
 
