@@ -253,6 +253,7 @@ async def async_generate_content(model, contents):
 #     except Exception:
 #         traceback.print_exc()
 #         await bot.edit_message_text(error_info, chat_id=sent_message.chat.id, message_id=sent_message.message_id)
+
 async def send_message_to_api(user_message: str, gemini_response: str, message: Message): 
     try:
         chat_id = message.chat.id
@@ -265,7 +266,10 @@ async def send_message_to_api(user_message: str, gemini_response: str, message: 
             "nickname": message.from_user.username  
         }
         logger.debug(f"Sending data to API: {data}")
-        response = requests.post(API_ENDPOINT, json=data)
+
+        # Run the blocking request in a separate thread
+        response = await asyncio.to_thread(requests.post, API_ENDPOINT, json=data)
+
         response.raise_for_status()
         logger.info("Data sent to API successfully.")
     except requests.exceptions.RequestException as e:
